@@ -1,24 +1,21 @@
 
 #include "utils/fluid_conv_tables.h"
-#include "gentables/ConstExprArr.hpp"
+#include "fluidsynth_priv.h"
 
 #include "gcem.hpp"
 
-struct ConcaveFunctor
+extern "C" const fluid_real_t fluid_concave_tab_cpp[] =
 {
-    /* There seems to be an error in the specs. The equations are
-       implemented according to the pictures on SF2.01 page 73. */
-    static constexpr fluid_real_t calc(int i)
-    {
-        return ((i == 0)
-            ? 0
-            : ((i == FLUID_VEL_CB_SIZE - 1)
-                ? 1
-                : ((-200.0 * 2 / FLUID_PEAK_ATTENUATION) * gcem::log(((FLUID_VEL_CB_SIZE - 1) - i) / (FLUID_VEL_CB_SIZE - 1.0)) / static_cast<double>(GCEM_LOG_10))
-                ));
-    }
+/* There seems to be an error in the specs. The equations are
+   implemented according to the pictures on SF2.01 page 73. */
+#define X(i) (fluid_real_t)(((i) == 0) \
+    ? 0 \
+    : (((i) == FLUID_VEL_CB_SIZE - 1) \
+        ? 1 \
+        : ((-200.0 * 2 / FLUID_PEAK_ATTENUATION) * gcem::log(((FLUID_VEL_CB_SIZE - 1) - (i)) / (FLUID_VEL_CB_SIZE - 1.0)) / static_cast<double>(GCEM_LOG_10)) \
+        )),
+#define AUTO_GEN_ARRAY_SIZE FLUID_VEL_CB_SIZE
+#include "auto_gen_array.h"
 };
-
-extern "C" const constexpr auto fluid_concave_tab_cpp = ConstExprArr<ConcaveFunctor, FLUID_VEL_CB_SIZE>::value;
 
 extern "C" const fluid_real_t *const fluid_concave_tab = fluid_concave_tab_cpp;
