@@ -17,6 +17,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include "fluid_iir_filter_impl.h"
 #include "fluid_sys.h"
 #include "fluid_iir_filter.h"
 #include "fluid_conv.h"
@@ -45,9 +46,8 @@
  * - dsp_hist1: same
  * - dsp_hist2: same
  */
-template<bool GAIN_NORM, bool AMPLIFY, enum fluid_iir_filter_type TYPE>
 static void
-fluid_iir_filter_apply_local(fluid_iir_filter_t *iir_filter, fluid_real_t *dsp_buf, unsigned int count)
+FLUID_IIR_FILTER_APPLY_LOCAL(GAIN_NORM, AMPLIFY, TYPE)(fluid_iir_filter_t *iir_filter, fluid_real_t *dsp_buf, unsigned int count)
 {
     // FLUID_IIR_Q_LINEAR may switch the filter off by setting Q==0
     // Due to the linear smoothing, last_q may not exactly become zero.
@@ -136,7 +136,7 @@ fluid_iir_filter_apply_local(fluid_iir_filter_t *iir_filter, fluid_real_t *dsp_b
 
                 LOG_FILTER("fres: %.2f Hz  | target_fres: %.2f Hz | fres_incr: %f\t| fres_incr_count: %d\t|---| q: %f\t| target_q: %f\t| q_incr: %f\t| q_incr_count: %d", fres, iir_filter->target_fres, fres_incr, fres_incr_count, q, iir_filter->target_q, q_incr, q_incr_count);
                 
-                fluid_iir_filter_calculate_coefficients<IIR_COEFF_T, GAIN_NORM, TYPE>(fres, q, iir_filter->sincos_table, &dsp_a1, &dsp_a2, &dsp_b02, &dsp_b1);
+                FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(IIR_COEFF_T, GAIN_NORM, TYPE)(fres, q, iir_filter->sincos_table, &dsp_a1, &dsp_a2, &dsp_b02, &dsp_b1);
             }
         }
 

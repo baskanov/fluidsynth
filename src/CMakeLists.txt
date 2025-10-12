@@ -149,6 +149,7 @@ set ( libfluidsynth_SOURCES
     rvoice/fluid_iir_filter_apply.inl
     rvoice/fluid_iir_filter_calculate_coefficients.inl
     rvoice/fluid_iir_filter_impl.cpp
+    rvoice/fluid_iir_filter_impl.h
     rvoice/fluid_iir_filter.c
     rvoice/fluid_iir_filter.h
     rvoice/fluid_lfo.c

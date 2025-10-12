@@ -17,6 +17,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include "fluid_iir_filter_impl.h"
 #include "fluid_sys.h"
 #include "fluid_iir_filter.h"
 #include "fluid_conv.h"
@@ -42,8 +43,52 @@ extern "C" void fluid_iir_filter_init_table(fluid_iir_sincos_t *sincos_table, fl
     }
 }
 
+#define R IIR_COEFF_T
+
+#define GAIN_NORM false
+
+#define TYPE FLUID_IIR_HIGHPASS
 #include "fluid_iir_filter_calculate_coefficients.inl"
+#define AMPLIFY false
 #include "fluid_iir_filter_apply.inl"
+#undef AMPLIFY
+
+#undef TYPE
+#define TYPE FLUID_IIR_LOWPASS
+
+#include "fluid_iir_filter_calculate_coefficients.inl"
+#define AMPLIFY false
+#include "fluid_iir_filter_apply.inl"
+#undef AMPLIFY
+
+#undef TYPE
+
+#undef GAIN_NORM
+#define GAIN_NORM true
+
+#define TYPE FLUID_IIR_HIGHPASS
+
+#include "fluid_iir_filter_calculate_coefficients.inl"
+#define AMPLIFY false
+#include "fluid_iir_filter_apply.inl"
+#undef AMPLIFY
+
+#undef TYPE
+#define TYPE FLUID_IIR_LOWPASS
+
+#include "fluid_iir_filter_calculate_coefficients.inl"
+#define AMPLIFY false
+#include "fluid_iir_filter_apply.inl"
+#undef AMPLIFY
+#define AMPLIFY true
+#include "fluid_iir_filter_apply.inl"
+#undef AMPLIFY
+
+#undef TYPE
+
+#undef GAIN_NORM
+
+#undef R
 
 extern "C" void fluid_iir_filter_apply(fluid_iir_filter_t *resonant_filter,
                                        fluid_iir_filter_t *resonant_custom_filter,
@@ -54,27 +99,27 @@ extern "C" void fluid_iir_filter_apply(fluid_iir_filter_t *resonant_filter,
     {
         if(resonant_custom_filter->type == FLUID_IIR_HIGHPASS)
         {
-            fluid_iir_filter_apply_local<false, false, FLUID_IIR_HIGHPASS>(resonant_custom_filter, dsp_buf, count);
+            FLUID_IIR_FILTER_APPLY_LOCAL(false, false, FLUID_IIR_HIGHPASS)(resonant_custom_filter, dsp_buf, count);
         }
         else
         {
-            fluid_iir_filter_apply_local<false, false, FLUID_IIR_LOWPASS>(resonant_custom_filter, dsp_buf, count);
+            FLUID_IIR_FILTER_APPLY_LOCAL(false, false, FLUID_IIR_LOWPASS)(resonant_custom_filter, dsp_buf, count);
         }
     }
     else
     {
         if(resonant_custom_filter->type == FLUID_IIR_HIGHPASS)
         {
-            fluid_iir_filter_apply_local<true, false, FLUID_IIR_HIGHPASS>(resonant_custom_filter, dsp_buf, count);
+            FLUID_IIR_FILTER_APPLY_LOCAL(true, false, FLUID_IIR_HIGHPASS)(resonant_custom_filter, dsp_buf, count);
         }
         else
         {
-            fluid_iir_filter_apply_local<true, false, FLUID_IIR_LOWPASS>(resonant_custom_filter, dsp_buf, count);
+            FLUID_IIR_FILTER_APPLY_LOCAL(true, false, FLUID_IIR_LOWPASS)(resonant_custom_filter, dsp_buf, count);
         }
     }
 
     // This is the last filter in the chain - the default SF2 filter that always runs. This one must apply the final envelope gain.
-    fluid_iir_filter_apply_local<true, true, FLUID_IIR_LOWPASS>(resonant_filter, dsp_buf, count);
+    FLUID_IIR_FILTER_APPLY_LOCAL(true, true, FLUID_IIR_LOWPASS)(resonant_filter, dsp_buf, count);
 }
 
 void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
@@ -162,7 +207,7 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
         {
             if(iir_filter->type == FLUID_IIR_HIGHPASS)
             {
-                fluid_iir_filter_calculate_coefficients<IIR_COEFF_T, false, FLUID_IIR_HIGHPASS>(
+                FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(IIR_COEFF_T, false, FLUID_IIR_HIGHPASS)(
                 last_fres_f,
                 last_q_f,
                 iir_filter->sincos_table,
@@ -173,7 +218,7 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
             }
             else
             {
-                fluid_iir_filter_calculate_coefficients<IIR_COEFF_T, false, FLUID_IIR_LOWPASS>(
+                FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(IIR_COEFF_T, false, FLUID_IIR_LOWPASS)(
                 last_fres_f,
                 last_q_f,
                 iir_filter->sincos_table,
@@ -187,7 +232,7 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
         {
             if(iir_filter->type == FLUID_IIR_HIGHPASS)
             {
-                fluid_iir_filter_calculate_coefficients<IIR_COEFF_T, true, FLUID_IIR_HIGHPASS>(
+                FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(IIR_COEFF_T, true, FLUID_IIR_HIGHPASS)(
                 last_fres_f,
                 last_q_f,
                 iir_filter->sincos_table,
@@ -198,7 +243,7 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
             }
             else
             {
-                fluid_iir_filter_calculate_coefficients<IIR_COEFF_T, true, FLUID_IIR_LOWPASS>(
+                FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(IIR_COEFF_T, true, FLUID_IIR_LOWPASS)(
                 last_fres_f,
                 last_q_f,
                 iir_filter->sincos_table,

@@ -17,20 +17,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include "fluid_iir_filter_impl.h"
 #include "fluid_sys.h"
 #include "fluid_iir_filter.h"
 #include "fluid_conv.h"
 
 #include <cmath>
 
-template<typename R, bool GAIN_NORM, enum fluid_iir_filter_type TYPE>
-static inline void fluid_iir_filter_calculate_coefficients(R fres,
-                                                           R q,
-                                                           fluid_iir_sincos_t *sincos_table,
-                                                           R *FLUID_RESTRICT a1_out,
-                                                           R *FLUID_RESTRICT a2_out,
-                                                           R *FLUID_RESTRICT b02_out,
-                                                           R *FLUID_RESTRICT b1_out)
+static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R fres,
+                                                                               R q,
+                                                                               fluid_iir_sincos_t *sincos_table,
+                                                                               R *FLUID_RESTRICT a1_out,
+                                                                               R *FLUID_RESTRICT a2_out,
+                                                                               R *FLUID_RESTRICT b02_out,
+                                                                               R *FLUID_RESTRICT b1_out)
 {
     R filter_gain = 1.0f;
 
