@@ -17,6 +17,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
+
 #include "fluid_rvoice_dsp.h"
 #include "fluid_sys.h"
 #include "fluid_rvoice.h"
@@ -46,7 +48,7 @@
 
 #undef LOOPING
 
-extern "C" int
+int
 fluid_rvoice_dsp_silence(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
 {
     if (looping)
@@ -59,7 +61,7 @@ fluid_rvoice_dsp_silence(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT ds
     }
 }
 
-extern "C" int
+int
 fluid_rvoice_dsp_interpolate(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
 {
     bool is_24bit = rvoice->dsp.sample->data24 != NULL;

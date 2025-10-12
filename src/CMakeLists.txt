@@ -158,7 +158,7 @@ set ( libfluidsynth_SOURCES
     rvoice/fluid_rvoice.c
     rvoice/fluid_rvoice_dsp_interpolate.inl
     rvoice/fluid_rvoice_dsp_silence.inl
-    rvoice/fluid_rvoice_dsp.cpp
+    rvoice/fluid_rvoice_dsp.c
     rvoice/fluid_rvoice_dsp.h
     rvoice/fluid_rvoice_event.h
     rvoice/fluid_rvoice_event.c
