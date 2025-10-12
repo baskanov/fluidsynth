@@ -22,21 +22,21 @@
 #include "fluid_iir_filter.h"
 #include "fluid_conv.h"
 
-#include <algorithm>
-#include <cmath>
+#include <stdbool.h>
 
 
 // Calculating the sine and cosine coefficients for every possible cutoff frequency is too CPU expensive and can harm real-time playback.
 // Therefore, we precalculate the coefficients with a precision of CENTS_STEP and store them in a table.
-extern "C" void fluid_iir_filter_init_table(fluid_iir_sincos_t *sincos_table, fluid_real_t sample_rate)
+void fluid_iir_filter_init_table(fluid_iir_sincos_t *sincos_table, fluid_real_t sample_rate)
 {
     const IIR_COEFF_T period = (IIR_COEFF_T)(2.0 * M_PI / sample_rate);
-    for(int fres_cents = FRES_MIN, i=0; fres_cents <= FRES_MAX; fres_cents += CENTS_STEP, i++)
+    int fres_cents, i;
+    for(fres_cents = FRES_MIN, i=0; fres_cents <= FRES_MAX; fres_cents += CENTS_STEP, i++)
     {
-        IIR_COEFF_T fres = static_cast<IIR_COEFF_T>(fluid_ct2hz(static_cast<fluid_real_t>(fres_cents)));
+        IIR_COEFF_T fres = (IIR_COEFF_T)fluid_ct2hz((fluid_real_t)fres_cents);
         IIR_COEFF_T omega = period * fres;
-        IIR_COEFF_T sin_coeff = std::sin(omega);
-        IIR_COEFF_T cos_coeff = std::cos(omega);
+        IIR_COEFF_T sin_coeff = FLUID_SIN(omega);
+        IIR_COEFF_T cos_coeff = FLUID_COS(omega);
         // i == (fres_cents - FRES_MIN) / CENTS_STEP;
         sincos_table[i].sin = sin_coeff;
         sincos_table[i].cos = cos_coeff;
@@ -90,7 +90,7 @@ extern "C" void fluid_iir_filter_init_table(fluid_iir_sincos_t *sincos_table, fl
 
 #undef R
 
-extern "C" void fluid_iir_filter_apply(fluid_iir_filter_t *resonant_filter,
+void fluid_iir_filter_apply(fluid_iir_filter_t *resonant_filter,
                                        fluid_iir_filter_t *resonant_custom_filter,
                                        fluid_real_t *dsp_buf,
                                        unsigned int count)
@@ -128,6 +128,8 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
 {
     bool calc_coeff_flag = false;
     fluid_real_t fres, fres_diff;
+    IIR_COEFF_T last_fres_f;
+    IIR_COEFF_T last_q_f;
     
     if(iir_filter->type == FLUID_IIR_DISABLED)
     {
@@ -181,7 +183,7 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
         // 5 was chosen because the phase doesn't really get any steeper when continuing to increase Q.
         fres_incr_count *= num_buffers;
         iir_filter->fres_incr = fres_diff / (fres_incr_count);
-        iir_filter->fres_incr_count = static_cast<int>(fres_incr_count + 0.5);
+        iir_filter->fres_incr_count = (int)(fres_incr_count + 0.5);
 
 #ifdef DBG_FILTER
         iir_filter->target_fres = fres;
@@ -199,8 +201,8 @@ void fluid_iir_filter_calc(fluid_iir_filter_t *iir_filter,
         // will be taken care of in fluid_iir_filter_apply().
     }
 
-    IIR_COEFF_T last_fres_f = static_cast<IIR_COEFF_T>(iir_filter->last_fres);
-    IIR_COEFF_T last_q_f = static_cast<IIR_COEFF_T>(iir_filter->last_q);
+    last_fres_f = (IIR_COEFF_T)iir_filter->last_fres;
+    last_q_f = (IIR_COEFF_T)iir_filter->last_q;
     if (calc_coeff_flag && !iir_filter->filter_startup)
     {
         if((iir_filter->flags & FLUID_IIR_NO_GAIN_AMP))

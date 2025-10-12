@@ -22,8 +22,6 @@
 #include "fluid_iir_filter.h"
 #include "fluid_conv.h"
 
-#include <cmath>
-
 static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R fres,
                                                                                R q,
                                                                                fluid_iir_sincos_t *sincos_table,
@@ -33,6 +31,13 @@ static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R
                                                                                R *FLUID_RESTRICT b1_out)
 {
     R filter_gain = 1.0f;
+    R b02_temp, b1_temp;
+    R alpha_coeff;
+    R sin_coeff;
+    R cos_coeff;
+    R a1_temp;
+    R a2_temp;
+    R a0_inv;
 
     /*
      * Those equations from Robert Bristow-Johnson's `Cookbook
@@ -43,14 +48,14 @@ static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R
      * into account for both significant frequency relocation and for
      * bandwidth readjustment'. */
 
-    signed tab_idx = (static_cast<signed>(fres) - FRES_MIN) / CENTS_STEP;
+    signed tab_idx = ((signed)fres - FRES_MIN) / CENTS_STEP;
 #ifndef DBG_FILTER
     fluid_clip(tab_idx, 0, SINCOS_TAB_SIZE - 1);
 #endif
-    R sin_coeff = sincos_table[tab_idx].sin;
-    R cos_coeff = sincos_table[tab_idx].cos;
-    R alpha_coeff = sin_coeff / (2.0f * q);
-    R a0_inv = 1.0f / (1.0f + alpha_coeff);
+    sin_coeff = sincos_table[tab_idx].sin;
+    cos_coeff = sincos_table[tab_idx].cos;
+    alpha_coeff = sin_coeff / (2.0f * q);
+    a0_inv = 1.0f / (1.0f + alpha_coeff);
 
     /* Calculate the filter coefficients. All coefficients are
      * normalized by a0. Think of `a1' as `a1/a0'.
@@ -62,9 +67,8 @@ static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R
      *  iir_filter->b2=(1.-cos_coeff)*a0_inv*0.5*filter_gain; */
 
     /* "a" coeffs are same for all 3 available filter types */
-    R a1_temp = -2.0f * cos_coeff * a0_inv;
-    R a2_temp = (1.0f - alpha_coeff) * a0_inv;
-    R b02_temp, b1_temp;
+    a1_temp = -2.0f * cos_coeff * a0_inv;
+    a2_temp = (1.0f - alpha_coeff) * a0_inv;
 
     if (GAIN_NORM)
     {
@@ -79,7 +83,7 @@ static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R
          *  (numerator of the filter equation).  This gain factor depends
          *  only on Q, so this is the right place to calculate it.
          */
-        filter_gain /= std::sqrt(q);
+        filter_gain /= FLUID_SQRT(q);
     }
 
     switch (TYPE)

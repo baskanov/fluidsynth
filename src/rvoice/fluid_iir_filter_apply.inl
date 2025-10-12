@@ -72,11 +72,11 @@ FLUID_IIR_FILTER_APPLY_LOCAL(GAIN_NORM, AMPLIFY, TYPE)(fluid_iir_filter_t *iir_f
         
         fluid_real_t dsp_amp = iir_filter->amp;
         fluid_real_t dsp_amp_incr = iir_filter->amp_incr;
-        IIR_COEFF_T fres = static_cast<IIR_COEFF_T>(iir_filter->last_fres);
-        IIR_COEFF_T q = static_cast<IIR_COEFF_T>(iir_filter->last_q);
+        IIR_COEFF_T fres = (IIR_COEFF_T)iir_filter->last_fres;
+        IIR_COEFF_T q = (IIR_COEFF_T)iir_filter->last_q;
         
-        const IIR_COEFF_T fres_incr = static_cast<IIR_COEFF_T>(iir_filter->fres_incr);
-        const IIR_COEFF_T q_incr = static_cast<IIR_COEFF_T>(iir_filter->q_incr);
+        const IIR_COEFF_T fres_incr = (IIR_COEFF_T)iir_filter->fres_incr;
+        const IIR_COEFF_T q_incr = (IIR_COEFF_T)iir_filter->q_incr;
 
         /* filter (implement the voice filter according to SoundFont standard) */
 

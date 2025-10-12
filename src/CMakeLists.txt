@@ -148,7 +148,7 @@ set ( libfluidsynth_SOURCES
     rvoice/fluid_chorus.h
     rvoice/fluid_iir_filter_apply.inl
     rvoice/fluid_iir_filter_calculate_coefficients.inl
-    rvoice/fluid_iir_filter_impl.cpp
+    rvoice/fluid_iir_filter_impl.c
     rvoice/fluid_iir_filter_impl.h
     rvoice/fluid_iir_filter.c
     rvoice/fluid_iir_filter.h
@@ -211,9 +211,9 @@ set ( fluid_file_SOURCES
 )
 
 if ( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-  set_source_files_properties(rvoice/fluid_iir_filter_impl.cpp PROPERTIES COMPILE_FLAGS "-fno-math-errno -ffast-math")
+  set_source_files_properties(rvoice/fluid_iir_filter_impl.c PROPERTIES COMPILE_FLAGS "-fno-math-errno -ffast-math")
 elseif ( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
-  set_source_files_properties(rvoice/fluid_iir_filter_impl.cpp PROPERTIES COMPILE_FLAGS "/fp:fast")
+  set_source_files_properties(rvoice/fluid_iir_filter_impl.c PROPERTIES COMPILE_FLAGS "/fp:fast")
 endif ( )
 
 
