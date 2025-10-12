@@ -725,66 +725,54 @@ fluid_rvoice_dsp_interpolate_7th_order_local(fluid_rvoice_t *rvoice, fluid_real_
     return (dsp_i);
 }
 
-struct ProcessSilence
+template<bool IS_24BIT, bool LOOPING>
+static int
+fluid_rvoice_dsp_interpolate_local(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf)
 {
-    template<bool IS_24BIT, bool LOOPING>
-    int operator()(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf) const
+    switch (rvoice->dsp.interp_method)
     {
-        return fluid_rvoice_dsp_silence_local<LOOPING>(rvoice, dsp_buf);
-    }
-};
+        case FLUID_INTERP_NONE:
+            return fluid_rvoice_dsp_interpolate_none_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
 
-struct InterpolateNone
+        case FLUID_INTERP_LINEAR:
+            return fluid_rvoice_dsp_interpolate_linear_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
+
+        case FLUID_INTERP_4THORDER:
+        default:
+            return fluid_rvoice_dsp_interpolate_4th_order_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
+
+        case FLUID_INTERP_7THORDER:
+            return fluid_rvoice_dsp_interpolate_7th_order_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
+    }
+}
+
+extern "C" int
+fluid_rvoice_dsp_silence(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
 {
-    template<bool IS_24BIT, bool LOOPING>
-    int operator()(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf) const
+    if (looping)
     {
-        return fluid_rvoice_dsp_interpolate_none_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
+        return fluid_rvoice_dsp_silence_local<true>(rvoice, dsp_buf);
     }
-};
-
-struct InterpolateLinear
-{
-    template<bool IS_24BIT, bool LOOPING>
-    int operator()(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf) const
+    else
     {
-        return fluid_rvoice_dsp_interpolate_linear_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
+        return fluid_rvoice_dsp_silence_local<false>(rvoice, dsp_buf);
     }
-};
+}
 
-struct Interpolate4thOrder
+extern "C" int
+fluid_rvoice_dsp_interpolate(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
 {
-    template<bool IS_24BIT, bool LOOPING>
-    int operator()(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf) const
-    {
-        return fluid_rvoice_dsp_interpolate_4th_order_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
-    }
-};
-
-struct Interpolate7thOrder
-{
-    template<bool IS_24BIT, bool LOOPING>
-    int operator()(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf) const
-    {
-        return fluid_rvoice_dsp_interpolate_7th_order_local<IS_24BIT, LOOPING>(rvoice, dsp_buf);
-    }
-};
-
-template<typename T>
-int dsp_invoker(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
-{
-    T func;
     bool is_24bit = rvoice->dsp.sample->data24 != NULL;
 
     if (is_24bit)
     {
         if (looping)
         {
-            return func.template operator()<true, true>(rvoice, dsp_buf);
+            return fluid_rvoice_dsp_interpolate_local<true, true>(rvoice, dsp_buf);
         }
         else
         {
-            return func.template operator()<true, false>(rvoice, dsp_buf);
+            return fluid_rvoice_dsp_interpolate_local<true, false>(rvoice, dsp_buf);
         }
     }
     else
@@ -792,37 +780,11 @@ int dsp_invoker(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, in
         // This case is most common, thanks to templating it will also become the fastest one
         if (looping)
         {
-            return func.template operator()<false, true>(rvoice, dsp_buf);
+            return fluid_rvoice_dsp_interpolate_local<false, true>(rvoice, dsp_buf);
         }
         else
         {
-            return func.template operator()<false, false>(rvoice, dsp_buf);
+            return fluid_rvoice_dsp_interpolate_local<false, false>(rvoice, dsp_buf);
         }
-    }
-}
-
-extern "C" int
-fluid_rvoice_dsp_silence(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
-{
-    return dsp_invoker<ProcessSilence>(rvoice, dsp_buf, looping);
-}
-
-extern "C" int
-fluid_rvoice_dsp_interpolate(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf, int looping)
-{
-    switch (rvoice->dsp.interp_method)
-    {
-        case FLUID_INTERP_NONE:
-            return dsp_invoker<InterpolateNone>(rvoice, dsp_buf, looping);
-
-        case FLUID_INTERP_LINEAR:
-            return dsp_invoker<InterpolateLinear>(rvoice, dsp_buf, looping);
-
-        case FLUID_INTERP_4THORDER:
-        default:
-            return dsp_invoker<Interpolate4thOrder>(rvoice, dsp_buf, looping);
-
-        case FLUID_INTERP_7THORDER:
-            return dsp_invoker<Interpolate7thOrder>(rvoice, dsp_buf, looping);
     }
 }
