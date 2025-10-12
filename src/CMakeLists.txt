@@ -146,6 +146,7 @@ set ( libfluidsynth_SOURCES
     rvoice/fluid_adsr_env.h
     rvoice/fluid_chorus.c
     rvoice/fluid_chorus.h
+    rvoice/fluid_iir_filter_calculate_coefficients.inl
     rvoice/fluid_iir_filter_impl.cpp
     rvoice/fluid_iir_filter.c
     rvoice/fluid_iir_filter.h
