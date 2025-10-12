@@ -17,12 +17,13 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#include "fluid_rvoice_dsp.h"
 #include "fluid_phase.h"
 #include "fluid_rvoice.h"
 
 /* Special case of interpolate_none for rendering silent voices, i.e. in delay phase or zero volume */
-template<bool LOOPING>
-static int fluid_rvoice_dsp_silence_local(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf)
+static int
+FLUID_RVOICE_DSP_SILENCE_LOCAL(LOOPING)(fluid_rvoice_t *rvoice, fluid_real_t *FLUID_RESTRICT dsp_buf)
 {
     fluid_rvoice_dsp_t *voice = &rvoice->dsp;
     fluid_phase_t dsp_phase = voice->phase;
