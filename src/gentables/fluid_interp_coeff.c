@@ -13,7 +13,7 @@ const fluid_real_t interp_coeff[] =
 //    interp_coeff[i][2] = (x * (0.5 + x * (2.0 - 1.5 * x)));
 //    interp_coeff[i][3] = (0.5 * x * x * (x - 1.0));
 //}
-#define x(i) ((double)(i) / (double)FLUID_INTERP_MAX)
+#define x(i) ((i) / (double)FLUID_INTERP_MAX)
 #define X(i) \
     (fluid_real_t)(x(i) * (-0.5 + x(i) * (1 - 0.5 * x(i)))), \
     (fluid_real_t)(1.0 + x(i) * x(i) * (1.5 * x(i) - 2.5)), \

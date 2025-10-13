@@ -10,7 +10,7 @@ const fluid_real_t fluid_cb2amp_tab[] =
  * between 0 and 144 dB. Therefore a negative attenuation is
  * not allowed.
  */
-#define X(i) (fluid_real_t)EXP10((fluid_real_t)(i) / -200.0),
+#define X(i) (fluid_real_t)EXP10((i) / -200.0),
 #define AUTO_GEN_ARRAY_SIZE FLUID_CB_AMP_SIZE
 #include "auto_gen_array.h"
 };

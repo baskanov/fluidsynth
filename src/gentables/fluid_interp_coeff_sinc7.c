@@ -59,9 +59,9 @@ const fluid_real_t sinc_table7[] =
 //        sinc_table7[i2][i] = v;
 //    }
 //}
-#define I_SHIFTED(i, i2) ((fluid_real_t)(i) - ((fluid_real_t)SINC_INTERP_ORDER / 2.0) + (fluid_real_t)(FLUID_INTERP_MAX - (i2) - 1) / (fluid_real_t)FLUID_INTERP_MAX)
+#define I_SHIFTED(i, i2) ((i) - SINC_INTERP_ORDER / 2.0 + (FLUID_INTERP_MAX - (i2) - 1.0) / FLUID_INTERP_MAX)
 #define SINC_TABLE(i, i2) (FABS(I_SHIFTED(i, i2)) > 0.000001 \
-        ? (SINPI(I_SHIFTED(i, i2)) / (M_PI * I_SHIFTED(i, i2))) * (0.5 * (1.0 + COSPI(2.0 * I_SHIFTED(i, i2) / (fluid_real_t)SINC_INTERP_ORDER))) \
+        ? SINPI(I_SHIFTED(i, i2)) / M_PI / I_SHIFTED(i, i2) * 0.5 * (1.0 + COSPI(2.0 * I_SHIFTED(i, i2) / SINC_INTERP_ORDER)) \
         : 1.0)
 #define X(i) \
     (fluid_real_t)SINC_TABLE(0, i), \
