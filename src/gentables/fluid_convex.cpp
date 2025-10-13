@@ -4,7 +4,7 @@
 
 #include "gcem.hpp"
 
-extern "C" const fluid_real_t fluid_convex_tab_cpp[] =
+extern "C" const fluid_real_t fluid_convex_tab[] =
 {
 /* There seems to be an error in the specs. The equations are
    implemented according to the pictures on SF2.01 page 73. */
@@ -17,5 +17,3 @@ extern "C" const fluid_real_t fluid_convex_tab_cpp[] =
 #define AUTO_GEN_ARRAY_SIZE FLUID_VEL_CB_SIZE
 #include "auto_gen_array.h"
 };
-
-extern "C" const fluid_real_t *const fluid_convex_tab = fluid_convex_tab_cpp;

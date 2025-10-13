@@ -5,7 +5,7 @@
 #define GCEM_E static_cast<double>(2.7182818284590452353602874713526624977572L)
 #include "gcem.hpp"
 
-extern "C" const fluid_real_t fluid_cb2amp_tab_cpp[] =
+extern "C" const fluid_real_t fluid_cb2amp_tab[] =
 {
 /* centibels to amplitude conversion
  * Note: SF2.01 section 8.1.3: Initial attenuation range is
@@ -16,5 +16,3 @@ extern "C" const fluid_real_t fluid_cb2amp_tab_cpp[] =
 #define AUTO_GEN_ARRAY_SIZE FLUID_CB_AMP_SIZE
 #include "auto_gen_array.h"
 };
-
-extern "C" const fluid_real_t *const fluid_cb2amp_tab = fluid_cb2amp_tab_cpp;

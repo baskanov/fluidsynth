@@ -46,9 +46,9 @@
 
 /* Interpolation (find a value between two samples of the original waveform) */
 
-extern const fluid_real_t *const interp_coeff_linear;
-extern const fluid_real_t *const interp_coeff;
-extern const fluid_real_t *const sinc_table7;
+extern const fluid_real_t interp_coeff_linear[];
+extern const fluid_real_t interp_coeff[];
+extern const fluid_real_t sinc_table7[];
 
 /* No interpolation. Just take the sample, which is closest to
   * the playback pointer.  Questionable quality, but very

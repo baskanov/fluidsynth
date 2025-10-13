@@ -4,7 +4,7 @@
 
 #include "gcem.hpp"
 
-extern "C" const fluid_real_t fluid_ct2hz_tab_cpp[] =
+extern "C" const fluid_real_t fluid_ct2hz_tab[] =
 {
 // 6,875 is just a factor that we already multiply into the lookup table to save
 // that multiplication in fluid_ct2hz_real()
@@ -13,5 +13,3 @@ extern "C" const fluid_real_t fluid_ct2hz_tab_cpp[] =
 #define AUTO_GEN_ARRAY_SIZE FLUID_CENTS_HZ_SIZE
 #include "auto_gen_array.h"
 };
-
-extern "C" const fluid_real_t *const fluid_ct2hz_tab = fluid_ct2hz_tab_cpp;

@@ -4,7 +4,7 @@
 
 #include "gcem.hpp"
 
-extern "C" const fluid_real_t interp_coeff_sinc7_cpp[] =
+extern "C" const fluid_real_t sinc_table7[] =
 {
 // Below is the original code. Note how indexing of sinc_table7 does not happen sequentially in this version:
 //
@@ -76,5 +76,3 @@ extern "C" const fluid_real_t interp_coeff_sinc7_cpp[] =
 #define AUTO_GEN_ARRAY_SIZE FLUID_INTERP_MAX
 #include "auto_gen_array.h"
 };
-
-extern "C" const fluid_real_t *const sinc_table7 = interp_coeff_sinc7_cpp;

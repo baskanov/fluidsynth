@@ -4,7 +4,7 @@
 
 #include "gcem.hpp"
 
-extern "C" const fluid_real_t interp_coeff_cpp[] =
+extern "C" const fluid_real_t interp_coeff[] =
 {
 //for (i = 0; i < FLUID_INTERP_MAX; i++)
 //{
@@ -24,5 +24,3 @@ extern "C" const fluid_real_t interp_coeff_cpp[] =
 #define AUTO_GEN_ARRAY_SIZE FLUID_INTERP_MAX
 #include "auto_gen_array.h"
 };
-
-extern "C" const fluid_real_t *const interp_coeff = interp_coeff_cpp;
