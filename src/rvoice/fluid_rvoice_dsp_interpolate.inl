@@ -68,7 +68,11 @@ FLUID_RVOICE_DSP_INTERPOLATE_NONE_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvoic
     /* Convert playback "speed" floating point value to phase index/fract */
     fluid_phase_set_float(dsp_phase_incr, voice->phase_incr);
 
-    end_index = LOOPING ? voice->loopend - 1 : voice->end;
+#if LOOPING
+    end_index = voice->loopend - 1;
+#else
+    end_index = voice->end;
+#endif
 
     while(1)
     {
@@ -86,11 +90,10 @@ FLUID_RVOICE_DSP_INTERPOLATE_NONE_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvoic
             dsp_phase_index = fluid_phase_index_round(dsp_phase);	/* round to nearest point */
         }
 
+#if !LOOPING
         /* break out if not looping (buffer may not be full) */
-        if(!LOOPING)
-        {
-            break;
-        }
+        break;
+#else
 
         /* go back to loop start */
         if(dsp_phase_index > end_index)
@@ -104,6 +107,7 @@ FLUID_RVOICE_DSP_INTERPOLATE_NONE_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvoic
         {
             break;
         }
+#endif
     }
 
     voice->phase = dsp_phase;
@@ -133,17 +137,18 @@ FLUID_RVOICE_DSP_INTERPOLATE_LINEAR_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvo
     fluid_phase_set_float(dsp_phase_incr, voice->phase_incr);
 
     /* last index before 2nd interpolation point must be specially handled */
-    end_index = (LOOPING ? voice->loopend - 1 : voice->end) - 1;
+#if LOOPING
+    end_index = voice->loopend - 1 - 1;
+#else
+    end_index = voice->end - 1;
+#endif
 
     /* 2nd interpolation point to use at end of loop or sample */
-    if(LOOPING)
-    {
-        point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);    /* loop start */
-    }
-    else
-    {
-        point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);    /* duplicate end for samples no longer looping */
-    }
+#if LOOPING
+    point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);    /* loop start */
+#else
+    point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);    /* duplicate end for samples no longer looping */
+#endif
 
     while(1)
     {
@@ -189,10 +194,9 @@ FLUID_RVOICE_DSP_INTERPOLATE_LINEAR_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvo
             dsp_phase_index = fluid_phase_index(dsp_phase);
         }
 
-        if(!LOOPING)
-        {
-            break;    /* break out if not looping (end of sample) */
-        }
+#if !LOOPING
+        break;    /* break out if not looping (end of sample) */
+#else
 
         /* go back to loop start (if past */
         if(dsp_phase_index > end_index)
@@ -208,6 +212,7 @@ FLUID_RVOICE_DSP_INTERPOLATE_LINEAR_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *rvo
         }
 
         end_index--;	/* set end back to second to last sample point */
+#endif
     }
 
     voice->phase = dsp_phase;
@@ -237,30 +242,33 @@ FLUID_RVOICE_DSP_INTERPOLATE_4TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
     fluid_phase_set_float(dsp_phase_incr, voice->phase_incr);
 
     /* last index before 4th interpolation point must be specially handled */
-    end_index = (LOOPING ? voice->loopend - 1 : voice->end) - 2;
+#if LOOPING
+    end_index = voice->loopend - 1 - 2;
+#else
+    end_index = voice->end - 2;
+#endif
 
+#if LOOPING
     if(voice->has_looped)	/* set start_index and start point if looped or not */
     {
         start_index = voice->loopstart;
         start_point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopend - 1);	/* last point in loop (wrap around) */
     }
     else
+#endif
     {
         start_index = voice->start;
         start_point = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->start);	/* just duplicate the point */
     }
 
     /* get points off the end (loop start if looping, duplicate point if end) */
-    if(LOOPING)
-    {
-        end_point1 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);
-        end_point2 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 1);
-    }
-    else
-    {
-        end_point1 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);
-        end_point2 = end_point1;
-    }
+#if LOOPING
+    end_point1 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);
+    end_point2 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 1);
+#else
+    end_point1 = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);
+    end_point2 = end_point1;
+#endif
 
     while(1)
     {
@@ -349,10 +357,9 @@ FLUID_RVOICE_DSP_INTERPOLATE_4TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
             dsp_phase_index = fluid_phase_index(dsp_phase);
         }
 
-        if(!LOOPING)
-        {
-            break;    /* break out if not looping (end of sample) */
-        }
+#if !LOOPING
+        break;    /* break out if not looping (end of sample) */
+#else
 
         /* go back to loop start */
         if(dsp_phase_index > end_index)
@@ -374,6 +381,7 @@ FLUID_RVOICE_DSP_INTERPOLATE_4TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
         }
 
         end_index -= 2;	/* set end back to third to last sample point */
+#endif
     }
 
     voice->phase = dsp_phase;
@@ -407,8 +415,13 @@ FLUID_RVOICE_DSP_INTERPOLATE_7TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
     fluid_phase_incr(dsp_phase, (fluid_phase_t)0x80000000);
 
     /* last index before 7th interpolation point must be specially handled */
-    end_index = (LOOPING ? voice->loopend - 1 : voice->end) - 3;
+#if LOOPING
+    end_index = voice->loopend - 1 - 3;
+#else
+    end_index = voice->end - 3;
+#endif
 
+#if LOOPING
     if(voice->has_looped)	/* set start_index and start point if looped or not */
     {
         start_index = voice->loopstart;
@@ -417,6 +430,7 @@ FLUID_RVOICE_DSP_INTERPOLATE_7TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
         start_points[2] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopend - 3);
     }
     else
+#endif
     {
         start_index = voice->start;
         start_points[0] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->start);	/* just duplicate the start point */
@@ -425,18 +439,15 @@ FLUID_RVOICE_DSP_INTERPOLATE_7TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
     }
 
     /* get the 3 points off the end (loop start if looping, duplicate point if end) */
-    if(LOOPING)
-    {
-        end_points[0] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);
-        end_points[1] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 1);
-        end_points[2] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 2);
-    }
-    else
-    {
-        end_points[0] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);
-        end_points[1] = end_points[0];
-        end_points[2] = end_points[0];
-    }
+#if LOOPING
+    end_points[0] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart);
+    end_points[1] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 1);
+    end_points[2] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->loopstart + 2);
+#else
+    end_points[0] = FLUID_RVOICE_GET_FLOAT_SAMPLE(IS_24BIT)(dsp_data, dsp_data24, voice->end);
+    end_points[1] = end_points[0];
+    end_points[2] = end_points[0];
+#endif
 
     while(1)
     {
@@ -608,10 +619,9 @@ FLUID_RVOICE_DSP_INTERPOLATE_7TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
             dsp_phase_index = fluid_phase_index(dsp_phase);
         }
 
-        if(!LOOPING)
-        {
-            break;    /* break out if not looping (end of sample) */
-        }
+#if !LOOPING
+        break;    /* break out if not looping (end of sample) */
+#else
 
         /* go back to loop start */
         if(dsp_phase_index > end_index)
@@ -635,6 +645,7 @@ FLUID_RVOICE_DSP_INTERPOLATE_7TH_ORDER_LOCAL(IS_24BIT, LOOPING)(fluid_rvoice_t *
         }
 
         end_index -= 3;	/* set end back to 4th to last sample point */
+#endif
     }
 
     /* sub 1/2 sample from dsp_phase since 7th order interpolation is centered on
