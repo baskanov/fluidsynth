@@ -70,21 +70,20 @@ static inline void FLUID_IIR_FILTER_CALCULATE_COEFFICIENTS(R, GAIN_NORM, TYPE)(R
     a1_temp = -2.0f * cos_coeff * a0_inv;
     a2_temp = (1.0f - alpha_coeff) * a0_inv;
 
-    if (GAIN_NORM)
-    {
-        /* SF 2.01 page 59:
-         *
-         *  The SoundFont specs ask for a gain reduction equal to half the
-         *  height of the resonance peak (Q).  For example, for a 10 dB
-         *  resonance peak, the gain is reduced by 5 dB.  This is done by
-         *  multiplying the total gain with sqrt(1/Q).  `Sqrt' divides dB
-         *  by 2 (100 lin = 40 dB, 10 lin = 20 dB, 3.16 lin = 10 dB etc)
-         *  The gain is later factored into the 'b' coefficients
-         *  (numerator of the filter equation).  This gain factor depends
-         *  only on Q, so this is the right place to calculate it.
-         */
-        filter_gain /= FLUID_SQRT(q);
-    }
+#if GAIN_NORM
+    /* SF 2.01 page 59:
+     *
+     *  The SoundFont specs ask for a gain reduction equal to half the
+     *  height of the resonance peak (Q).  For example, for a 10 dB
+     *  resonance peak, the gain is reduced by 5 dB.  This is done by
+     *  multiplying the total gain with sqrt(1/Q).  `Sqrt' divides dB
+     *  by 2 (100 lin = 40 dB, 10 lin = 20 dB, 3.16 lin = 10 dB etc)
+     *  The gain is later factored into the 'b' coefficients
+     *  (numerator of the filter equation).  This gain factor depends
+     *  only on Q, so this is the right place to calculate it.
+     */
+    filter_gain /= FLUID_SQRT(q);
+#endif
 
     switch (TYPE)
     {

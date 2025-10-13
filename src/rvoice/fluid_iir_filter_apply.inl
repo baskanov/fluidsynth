@@ -70,8 +70,10 @@ FLUID_IIR_FILTER_APPLY_LOCAL(GAIN_NORM, AMPLIFY, TYPE)(fluid_iir_filter_t *iir_f
         int fres_incr_count = iir_filter->fres_incr_count;
         int q_incr_count = iir_filter->q_incr_count;
         
+#if AMPLIFY
         fluid_real_t dsp_amp = iir_filter->amp;
         fluid_real_t dsp_amp_incr = iir_filter->amp_incr;
+#endif
         IIR_COEFF_T fres = (IIR_COEFF_T)iir_filter->last_fres;
         IIR_COEFF_T q = (IIR_COEFF_T)iir_filter->last_q;
         
@@ -103,15 +105,12 @@ FLUID_IIR_FILTER_APPLY_LOCAL(GAIN_NORM, AMPLIFY, TYPE)(fluid_iir_filter_t *iir_f
             // dsp_hist1 = dsp_b1 * dsp_input - dsp_a1 * dsp_buf[dsp_i] + dsp_hist2;
             // dsp_hist2 = dsp_b02 * dsp_input - dsp_a2 * dsp_buf[dsp_i];
 
-            if(AMPLIFY)
-            {
-                dsp_buf[dsp_i] = dsp_amp * sample;
-                dsp_amp += dsp_amp_incr;
-            }
-            else
-            {
-                dsp_buf[dsp_i] = sample;
-            }
+#if AMPLIFY
+            dsp_buf[dsp_i] = dsp_amp * sample;
+            dsp_amp += dsp_amp_incr;
+#else
+            dsp_buf[dsp_i] = sample;
+#endif
 
             if(fres_incr_count > 0 || q_incr_count > 0)
             {
@@ -161,6 +160,8 @@ FLUID_IIR_FILTER_APPLY_LOCAL(GAIN_NORM, AMPLIFY, TYPE)(fluid_iir_filter_t *iir_f
         iir_filter->fres_incr_count = fres_incr_count;
         iir_filter->last_q = q;
         iir_filter->q_incr_count = q_incr_count;
+#if AMPLIFY
         iir_filter->amp = dsp_amp;
+#endif
     }
 }
