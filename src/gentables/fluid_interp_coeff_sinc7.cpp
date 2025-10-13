@@ -1,8 +1,7 @@
 
 #include "rvoice/fluid_rvoice_dsp_tables.h"
 #include "fluidsynth_priv.h"
-
-#include "gcem.hpp"
+#include "auto_gen_math.h"
 
 extern "C" const fluid_real_t sinc_table7[] =
 {
@@ -61,9 +60,8 @@ extern "C" const fluid_real_t sinc_table7[] =
 //    }
 //}
 #define I_SHIFTED(i, i2) ((fluid_real_t)(i) - ((fluid_real_t)SINC_INTERP_ORDER / 2.0) + (fluid_real_t)(FLUID_INTERP_MAX - (i2) - 1) / (fluid_real_t)FLUID_INTERP_MAX)
-#define ARG(i, i2) (static_cast<double>(GCEM_PI) * I_SHIFTED(i, i2))
-#define SINC_TABLE(i, i2) (gcem::fabs(I_SHIFTED(i, i2)) > 0.000001 \
-        ? (gcem::sin(ARG(i, i2)) / (ARG(i, i2))) * (0.5 * (1.0 + gcem::cos(2.0 * ARG(i, i2) / (fluid_real_t)SINC_INTERP_ORDER))) \
+#define SINC_TABLE(i, i2) (FABS(I_SHIFTED(i, i2)) > 0.000001 \
+        ? (SINPI(I_SHIFTED(i, i2)) / (M_PI * I_SHIFTED(i, i2))) * (0.5 * (1.0 + COSPI(2.0 * I_SHIFTED(i, i2) / (fluid_real_t)SINC_INTERP_ORDER))) \
         : 1.0)
 #define X(i) \
     (fluid_real_t)SINC_TABLE(0, i), \

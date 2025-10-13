@@ -115,6 +115,7 @@ set ( libfluidsynth_SOURCES
     gentables/auto_gen_array.h
     gentables/auto_gen_array16.h
     gentables/auto_gen_array256.h
+    gentables/auto_gen_math.h
     gentables/fluid_ct2hz.cpp
     gentables/fluid_cb2amp.cpp
     gentables/fluid_concave.cpp

@@ -2,8 +2,6 @@
 #include "rvoice/fluid_rvoice_dsp_tables.h"
 #include "fluidsynth_priv.h"
 
-#include "gcem.hpp"
-
 extern "C" const fluid_real_t interp_coeff_linear[] =
 {
 //for (i = 0; i < FLUID_INTERP_MAX; i++)
