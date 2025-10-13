@@ -2,7 +2,7 @@
 #include "rvoice/fluid_rvoice_dsp_tables.h"
 #include "fluidsynth_priv.h"
 
-extern "C" const fluid_real_t interp_coeff[] =
+const fluid_real_t interp_coeff[] =
 {
 //for (i = 0; i < FLUID_INTERP_MAX; i++)
 //{

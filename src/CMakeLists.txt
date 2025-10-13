@@ -116,14 +116,14 @@ set ( libfluidsynth_SOURCES
     gentables/auto_gen_array16.h
     gentables/auto_gen_array256.h
     gentables/auto_gen_math.h
-    gentables/fluid_ct2hz.cpp
-    gentables/fluid_cb2amp.cpp
-    gentables/fluid_concave.cpp
-    gentables/fluid_convex.cpp
-    gentables/fluid_pan.cpp
-    gentables/fluid_interp_coeff.cpp
-    gentables/fluid_interp_coeff_linear.cpp
-    gentables/fluid_interp_coeff_sinc7.cpp
+    gentables/fluid_ct2hz.c
+    gentables/fluid_cb2amp.c
+    gentables/fluid_concave.c
+    gentables/fluid_convex.c
+    gentables/fluid_pan.c
+    gentables/fluid_interp_coeff.c
+    gentables/fluid_interp_coeff_linear.c
+    gentables/fluid_interp_coeff_sinc7.c
     utils/fluid_conv.c
     utils/fluid_conv.h
     utils/fluid_hash.c

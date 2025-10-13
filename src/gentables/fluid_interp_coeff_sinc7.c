@@ -3,7 +3,7 @@
 #include "fluidsynth_priv.h"
 #include "auto_gen_math.h"
 
-extern "C" const fluid_real_t sinc_table7[] =
+const fluid_real_t sinc_table7[] =
 {
 // Below is the original code. Note how indexing of sinc_table7 does not happen sequentially in this version:
 //
